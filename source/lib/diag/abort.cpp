@@ -20,51 +20,72 @@
 #include <algorithm>
 #include <atomic>
 
-namespace exl::diag {
+#include "program/logger/logger.hpp"
 
-    void NORETURN NOINLINE AbortImpl(const AbortCtx & ctx) {
-        #ifdef EXL_SUPPORTS_REBOOTPAYLOAD
+#ifdef EXL_SUPPORTS_REBOOTPAYLOAD
+#include "lib/util/sys/soc.hpp"
+#include "reboot_to_payload.hpp"
+#endif
+
+namespace exl::diag
+{
+
+    void NORETURN NOINLINE AbortImpl(const AbortCtx &ctx)
+    {
+#ifdef EXL_SUPPORTS_REBOOTPAYLOAD
         /* Ensure abort handler doesn't recursively abort. */
         static std::atomic<bool> recurse_guard;
         auto recursing = recurse_guard.exchange(true);
 
-        if(!recursing && util::IsSocErista()) {
+        if (!recursing && util::IsSocErista())
+        {
             /* Reboot to abort payload.*/
             AbortToPayload(ctx);
-        } else 
-        #endif
+        }
+        else
+#endif
         {
             /* We have no capability of chainloading payloads on mariko. */
             /* Don't have a great solution for this at the moment, just data abort. */
             /* TODO: maybe write to a file? custom fatal program? */
             register u64 addr __asm__("x27") = 0x6969696969696969;
-            register u64 val __asm__("x28")  = ctx.m_Result;
-            while (true) {
-                __asm__ __volatile__ (
+            register u64 val __asm__("x28") = ctx.m_Result;
+            while (true)
+            {
+                __asm__ __volatile__(
                     "str %[val], [%[addr]]"
                     :
-                    : [val]"r"(val), [addr]"r"(addr)
-                );
+                    : [val] "r"(val), [addr] "r"(addr));
             }
         }
 
         UNREACHABLE;
     }
 
-    #define ABORT_WITH_VALUE(v)                             \
-    {                                                       \
-        exl::diag::AbortCtx ctx {.m_Result = (Result)v};    \
-        AbortImpl(ctx);                                     \
+#define ABORT_WITH_VALUE(v)                             \
+    {                                                   \
+        exl::diag::AbortCtx ctx{.m_Result = (Result)v}; \
+        AbortImpl(ctx);                                 \
     }
 
     /* TODO: better assert/abort support. */
-    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...) ABORT_WITH_VALUE(value)
-    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value)                          ABORT_WITH_VALUE(value)
-    void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...)            ABORT_WITH_VALUE(value)
-    void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value)                                     ABORT_WITH_VALUE(value)
+    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...)
+    {
+        // format with vargs
+        char buf[0x100];
+        va_list args;
+        va_start(args, format);
+        std::vsnprintf(buf, sizeof(buf), format, args);
+        va_end(args);
+
+        // log
+        Logger::log("Assertion Failure: %s (%s:%d)", buf, file, line);
+        ABORT_WITH_VALUE(value)
+    }
+    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value)
 
 };
 
 /* C shim for libnx */
-extern "C" NORETURN void exl_abort(Result r) 
+extern "C" NORETURN void exl_abort(Result r)
     ABORT_WITH_VALUE(r)

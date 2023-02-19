@@ -1,42 +1,62 @@
 #include "lib.hpp"
+#include "nn.hpp"
+#include "starlight.hpp"
+#include "socket/socket.hpp"
+#include "logger/logger.hpp"
 
-/* Define hook StubCopyright. Trampoline indicates the original function should be kept. */
-/* HOOK_DEFINE_REPLACE can be used if the original function does not need to be kept. */
-HOOK_DEFINE_TRAMPOLINE(StubCopyright) {
+// #define USE_SOCKET
 
-    /* Define the callback for when the function is called. Don't forget to make it static and name it Callback. */
-    static void Callback(bool enabled) {
+#ifdef USE_SOCKET
+static Socket gSocket;
 
-        /* Call the original function, with the argument always being false. */
-        Orig(false);
-    }
+void logToSocket(const char *str)
+{
+    gSocket.sendMessage(str);
+}
+#endif
 
-};
+HOOK_DEFINE_TRAMPOLINE(MainInitHook){
+    static void Callback(){
 
+        R_ABORT_UNLESS(nn::fs::MountSdCardForDebug("sd"));
 
-/* Declare function to dynamic link with. */
-namespace nn::oe {
-    void SetCopyrightVisibility(bool);
-};
+// nn::fs::DeleteFile("sd:/starlight.log");
 
-extern "C" void exl_main(void* x0, void* x1) {
+// Logger::addListener(&logToFile);
+
+#ifdef USE_SOCKET
+if (gSocket.init("10.0.0.10", 3080).isFailure())
+{
+    *(u32 *)0 = 0;
+    Logger::log("Failed to connect to logging server!\n");
+}
+else
+{
+    Logger::addListener(&logToSocket);
+    Logger::log("Connected to logging server!\n");
+}
+#endif
+
+Logger::log("Starlight Loaded!\n");
+Orig();
+}
+}
+;
+
+extern "C" void exl_main(void *x0, void *x1)
+{
+    envSetOwnProcessHandle(exl::util::proc_handle::Get());
+
     /* Setup hooking enviroment. */
     exl::hook::Initialize();
 
-    /* Install the hook at the provided function pointer. Function type is checked against the callback function. */
-    StubCopyright::InstallAtFuncPtr(nn::oe::SetCopyrightVisibility);
+    MainInitHook::InstallAtSymbol("nnMain");
 
-    /* Alternative install funcs: */
-    /* InstallAtPtr takes an absolute address as a uintptr_t. */
-    /* InstallAtOffset takes an offset into the main module. */
-
-    /*
-    For sysmodules/applets, you have to call the entrypoint when ready
-    exl::hook::CallTargetEntrypoint(x0, x1);
-    */
+    Starlight::UI::InitializeHooks();
 }
 
-extern "C" NORETURN void exl_exception_entry() {
+extern "C" NORETURN void exl_exception_entry()
+{
     /* TODO: exception handling */
     EXL_ABORT(0x420);
 }
