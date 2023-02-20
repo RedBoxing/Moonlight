@@ -1,5 +1,6 @@
 #include "common.hpp"
 #include "lib.hpp"
+#include "nn/pl.h"
 #include "nvn/nvn.h"
 #include "nvn/nvn_Cpp.h"
 #include "nvn/nvn_CppFuncPtrImpl.h"
@@ -23,6 +24,7 @@ nvn::WindowBuilderSetTexturesFunc tempWindowBuilderSetTexFunc;
 nvn::WindowSetCropFunc tempWindowSetCropFunc;
 
 bool isUIInitialized = false;
+std::unique_ptr<Starlight::UI::Menu> mainMenu;
 
 static void *(*mallocFuncPtr)(size_t size);
 static void (*freeFuncPtr)(void *ptr);
@@ -39,7 +41,7 @@ void setStyle(ImGuiStyle *style)
     colors[ImGuiCol_ButtonActive] = ImVec4(0, 0.13, 0.13, 1);
 
     style->WindowBorderSize = 0;
-    // style->FramePadding = ImVec2(8, 6);
+    style->ButtonTextAlign = ImVec2(0.1f, 0.5f);
 }
 
 bool Starlight::UI::Initialize()
@@ -69,12 +71,32 @@ bool Starlight::UI::Initialize()
 
         Logger::log("Loading Font.\n");
 
-        void *data = nullptr;
-        size_t size = 0;
-        Starlight::FS::readFile("sd:/starlight/Tenacity.ttf", &data, &size);
+        if (nn::pl::GetSharedFontSize(nn::pl::SharedFontType_Standard) != 1)
+        {
+            bool load_started = false;
+            u32 loadState = 0;
 
-        // io.Fonts->AddFontFromMemoryTTF(loadData.buffer, loadData.bufSize, 16.0f, nullptr, io.Fonts->GetGlyphRangesDefault());
-        // io.Fonts->AddFontFromFileTTF("sd:/starlight/Tenacity.ttf", 15.0f);
+            while (true)
+            {
+                if (load_started)
+                    svcSleepThread(1000000000ULL / 60);
+
+                loadState = nn::pl::GetSharedFontLoadState(nn::pl::SharedFontType_Standard);
+                if (loadState == 1)
+                    break;
+
+                if (!load_started)
+                {
+                    nn::pl::RequestSharedFontLoad(nn::pl::SharedFontType_Standard);
+                    load_started = true;
+                }
+            }
+        }
+
+        size_t size = nn::pl::GetSharedFontSize(nn::pl::SharedFontType_Standard);
+        void *data = (void *)nn::pl::GetSharedFontAddress(nn::pl::SharedFontType_Standard);
+
+        io.Fonts->AddFontFromMemoryTTF(data, size, 26.0f, nullptr, nullptr);
         io.Fonts->Build();
         (void)io;
 
@@ -91,6 +113,11 @@ bool Starlight::UI::Initialize()
         ImguiNvnBackend::InitBackend(initInfo);
         Starlight::HID::Initialize();
 
+        Logger::log("Initializing Menu Framework.\n");
+
+        mainMenu = std::make_unique<Starlight::UI::Menu>();
+        mainMenu->Initialize();
+
         Logger::log("UI Initialized.\n");
 
         return true;
@@ -102,60 +129,11 @@ bool Starlight::UI::Initialize()
     }
 }
 
-bool CenteredButton(const char *label, ImVec2 _size, float alignment = 0.5f)
-{
-    ImGuiStyle &style = ImGui::GetStyle();
-
-    float size = ImGui::CalcTextSize(label).x + style.FramePadding.x * 2.0f;
-    float avail = ImGui::GetContentRegionAvail().x;
-
-    float off = (avail - size) * alignment;
-    if (off > 0.0f)
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-
-    return ImGui::Button(label, _size);
-}
-
 void presentTexture(nvn::Queue *queue, nvn::Window *window, int texIndex)
 {
-    if (isUIInitialized)
+    if (isUIInitialized && mainMenu != nullptr)
     {
-        // procDraw();
-        Starlight::HID::updatePadState();
-
-        if (Starlight::HID::isInputToggled())
-        {
-            ImguiNvnBackend::newFrame();
-            ImGui::NewFrame();
-
-            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-            ImGuiViewport *viewport = ImGui::GetMainViewport();
-            ImGui::SetNextWindowPos(viewport->Pos);
-            ImGui::SetNextWindowSize({448, viewport->Size.y});
-
-            ImGui::Begin("Starlight", nullptr, window_flags);
-            ImGui::Text("Starlight");
-            ImGui::Text("V1.0.0 - PRIVATE");
-
-            ImGui::Spacing();
-            ImGui::Separator();
-
-            ImGui::SetCursorPosX(32);
-            ImGui::Button("Save Options", {363, 69});
-
-            ImGui::SetCursorPosX(32);
-            ImGui::Button("Movement Options", {363, 69});
-
-            ImGui::SetCursorPosX(32);
-            ImGui::Button("Player Options", {363, 69});
-
-            ImGui::End();
-
-            ImGui::Render();
-            ImguiNvnBackend::renderDrawData(ImGui::GetDrawData());
-        }
+        mainMenu->update();
     }
 
     tempPresentTexFunc(queue, window, texIndex);
@@ -282,4 +260,12 @@ void Starlight::UI::InitializeHooks()
     nn::ro::LookupSymbol(reinterpret_cast<uintptr_t *>(&freeFuncPtr), "free");
 
     NvnBootstrapHook::InstallAtSymbol("nvnBootstrapLoader");
+}
+
+void Starlight::UI::Utils::drawSeparator(int x, int y, int width, int tickness, ImU32 color)
+{
+    float x2 = x + width;
+    float y2 = y + tickness;
+
+    ImGui::GetWindowDrawList()->AddLine(ImVec2(x, y), ImVec2(x2, y2), color);
 }

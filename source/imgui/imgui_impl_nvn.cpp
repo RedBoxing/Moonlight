@@ -497,11 +497,6 @@ namespace ImguiNvnBackend
 
     void updateInput()
     {
-        if (!Starlight::HID::isInputToggled())
-        {
-            return;
-        }
-
         ImGuiIO &io = ImGui::GetIO();
 
         for (auto [im_k, nx_k] : npad_mapping)

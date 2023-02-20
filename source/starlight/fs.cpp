@@ -50,10 +50,10 @@ void Starlight::FS::readFile(const char *path, void **data, size_t *size)
     nn::fs::GetFileSize(&fileSize, fileHandle);
 
     *size = fileSize;
-    void *buffer = new char[fileSize];
+    *data = malloc(fileSize);
 
-    EXL_ASSERT(buffer, "Failed to Allocate Buffer! File Size: %ld", fileSize);
-    R_ABORT_UNLESS(nn::fs::ReadFile(fileHandle, 0, buffer, fileSize))
+    EXL_ASSERT(*data, "Failed to Allocate Buffer! File Size: %ld", fileSize);
+    R_ABORT_UNLESS(nn::fs::ReadFile(fileHandle, 0, *data, fileSize))
 
     nn::fs::CloseFile(fileHandle);
 }

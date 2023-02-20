@@ -9,8 +9,6 @@ nn::hid::KeyboardState prevKeyboardState{};
 nn::hid::MouseState curMouseState{};
 nn::hid::MouseState prevMouseState{};
 
-bool toggleInput = false;
-
 void tryGetContState(nn::hid::NpadBaseState *state, ulong port)
 {
 
@@ -54,15 +52,6 @@ void Starlight::HID::updatePadState()
 
     prevMouseState = curMouseState;
     nn::hid::GetMouseState(&curMouseState);
-
-    if (isButtonHold(nn::hid::NpadButton::ZL) && isButtonHold(nn::hid::NpadButton::ZR))
-    {
-        toggleInput = true;
-    }
-    else if (isButtonHold(nn::hid::NpadButton::B))
-    {
-        toggleInput = false;
-    }
 }
 
 bool Starlight::HID::isButtonHold(nn::hid::NpadButton button)
@@ -108,11 +97,6 @@ bool Starlight::HID::isKeyPressed(nn::hid::KeyboardKey button)
 bool Starlight::HID::isKeyReleased(nn::hid::KeyboardKey button)
 {
     return !curKeyboardState.keys.isBitSet(button) && prevKeyboardState.keys.isBitSet(button);
-}
-
-bool Starlight::HID::isInputToggled()
-{
-    return toggleInput;
 }
 
 void Starlight::HID::getMouseCoords(float *x, float *y)

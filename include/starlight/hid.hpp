@@ -22,8 +22,6 @@ namespace Starlight
         bool isKeyPressed(nn::hid::KeyboardKey button);
         bool isKeyReleased(nn::hid::KeyboardKey button);
 
-        bool isInputToggled();
-
         void getMouseCoords(float *x, float *y);
         void getScrollDelta(float *x, float *y);
     }
