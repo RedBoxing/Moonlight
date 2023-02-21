@@ -9,10 +9,13 @@ nn::hid::KeyboardState prevKeyboardState{};
 nn::hid::MouseState curMouseState{};
 nn::hid::MouseState prevMouseState{};
 
+bool isReadInput = false;
+
 void tryGetContState(nn::hid::NpadBaseState *state, ulong port)
 {
 
     nn::hid::NpadStyleSet styleSet = nn::hid::GetNpadStyleSet(port);
+    isReadInput = true;
 
     if (styleSet.isBitSet(nn::hid::NpadStyleTag::NpadStyleFullKey))
     {
@@ -34,6 +37,8 @@ void tryGetContState(nn::hid::NpadBaseState *state, ulong port)
     {
         nn::hid::GetNpadState((nn::hid::NpadHandheldState *)state, 0x20);
     }
+
+    isReadInput = false;
 }
 
 void Starlight::HID::Initialize()
@@ -109,4 +114,9 @@ void Starlight::HID::getScrollDelta(float *x, float *y)
 {
     *x = curMouseState.wheelDeltaX;
     *y = curMouseState.wheelDeltaY;
+}
+
+bool Starlight::HID::isReadingInput()
+{
+    return isReadInput;
 }

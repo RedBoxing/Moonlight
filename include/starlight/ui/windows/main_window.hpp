@@ -14,7 +14,9 @@ namespace Starlight
                 MainWindow();
                 ~MainWindow();
 
-                void handleInputs();
+                void handleInputs() override;
+                void onEnable() override;
+                void onDisable() override;
             };
         }
     }

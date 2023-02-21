@@ -16,6 +16,9 @@ namespace Starlight
             void Initialize();
             void update();
 
+            bool isFocused();
+            void setFocused(bool focused);
+
         private:
             std::vector<Window *> windows;
         };

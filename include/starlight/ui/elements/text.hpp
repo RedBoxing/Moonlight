@@ -2,24 +2,21 @@
 
 #include "element.hpp"
 #include <string>
-#include <functional>
-
 namespace Starlight
 {
     namespace UI
     {
         namespace Elements
         {
-            class Button : public Element
+            class Text : public Element
             {
             public:
-                Button(std::string text, std::function<void()> onClick);
+                Text(std::string text);
 
                 void render();
 
             private:
                 std::string text;
-                std::function<void()> onClick;
             };
         }
     }

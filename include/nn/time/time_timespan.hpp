@@ -18,18 +18,22 @@
 
 #include "nn/nn_common.hpp"
 
-namespace nn {
+namespace nn
+{
 
-    struct TimeSpanType {
-      public:
+    struct TimeSpanType
+    {
+    public:
         s64 _ns;
 
-      public:
+    public:
         static constexpr ALWAYS_INLINE TimeSpanType FromNanoSeconds(s64 ns) { return {ns}; }
-        static constexpr ALWAYS_INLINE TimeSpanType FromMicroSeconds(s64 ms) {
+        static constexpr ALWAYS_INLINE TimeSpanType FromMicroSeconds(s64 ms)
+        {
             return FromNanoSeconds(ms * INT64_C(1000));
         }
-        static constexpr ALWAYS_INLINE TimeSpanType FromMilliSeconds(s64 ms) {
+        static constexpr ALWAYS_INLINE TimeSpanType FromMilliSeconds(s64 ms)
+        {
             return FromMicroSeconds(ms * INT64_C(1000));
         }
         static constexpr ALWAYS_INLINE TimeSpanType FromSeconds(s64 s) { return FromMilliSeconds(s * INT64_C(1000)); }
@@ -39,68 +43,85 @@ namespace nn {
 
         constexpr ALWAYS_INLINE s64 GetNanoSeconds() const { return _ns; }
         constexpr ALWAYS_INLINE s64 GetMicroSeconds() const { return this->GetNanoSeconds() / (INT64_C(1000)); }
-        constexpr ALWAYS_INLINE s64 GetMilliSeconds() const {
+        constexpr ALWAYS_INLINE s64 GetMilliSeconds() const
+        {
             return this->GetNanoSeconds() / (INT64_C(1000) * INT64_C(1000));
         }
-        constexpr ALWAYS_INLINE s64 GetSeconds() const {
+        constexpr ALWAYS_INLINE s64 GetSeconds() const
+        {
             return this->GetNanoSeconds() / (INT64_C(1000) * INT64_C(1000) * INT64_C(1000));
         }
-        constexpr ALWAYS_INLINE s64 GetMinutes() const {
+        constexpr ALWAYS_INLINE s64 GetMinutes() const
+        {
             return this->GetNanoSeconds() / (INT64_C(1000) * INT64_C(1000) * INT64_C(1000) * INT64_C(60));
         }
-        constexpr ALWAYS_INLINE s64 GetHours() const {
+        constexpr ALWAYS_INLINE s64 GetHours() const
+        {
             return this->GetNanoSeconds() / (INT64_C(1000) * INT64_C(1000) * INT64_C(1000) * INT64_C(60) * INT64_C(60));
         }
-        constexpr ALWAYS_INLINE s64 GetDays() const {
+        constexpr ALWAYS_INLINE s64 GetDays() const
+        {
             return this->GetNanoSeconds() /
                    (INT64_C(1000) * INT64_C(1000) * INT64_C(1000) * INT64_C(60) * INT64_C(60) * INT64_C(24));
         }
 
-        constexpr ALWAYS_INLINE friend bool operator==(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator==(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns == rhs._ns;
         }
-        constexpr ALWAYS_INLINE friend bool operator!=(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator!=(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns != rhs._ns;
         }
-        constexpr ALWAYS_INLINE friend bool operator<=(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator<=(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns <= rhs._ns;
         }
-        constexpr ALWAYS_INLINE friend bool operator>=(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator>=(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns >= rhs._ns;
         }
-        constexpr ALWAYS_INLINE friend bool operator<(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator<(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns < rhs._ns;
         }
-        constexpr ALWAYS_INLINE friend bool operator>(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator>(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             return lhs._ns > rhs._ns;
         }
 
-        constexpr ALWAYS_INLINE TimeSpanType& operator+=(const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE TimeSpanType &operator+=(const TimeSpanType &rhs)
+        {
             _ns += rhs._ns;
             return *this;
         }
-        constexpr ALWAYS_INLINE TimeSpanType& operator-=(const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE TimeSpanType &operator-=(const TimeSpanType &rhs)
+        {
             _ns -= rhs._ns;
             return *this;
         }
 
-        constexpr ALWAYS_INLINE friend TimeSpanType operator+(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend TimeSpanType operator+(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             TimeSpanType r(lhs);
             return r += rhs;
         }
-        constexpr ALWAYS_INLINE friend TimeSpanType operator-(const TimeSpanType& lhs, const TimeSpanType& rhs) {
+        constexpr ALWAYS_INLINE friend TimeSpanType operator-(const TimeSpanType &lhs, const TimeSpanType &rhs)
+        {
             TimeSpanType r(lhs);
             return r -= rhs;
         }
     };
 
-    class TimeSpan {
+    class TimeSpan
+    {
 
-      private:
+    private:
         TimeSpanType m_ts;
 
-      public:
-        constexpr ALWAYS_INLINE TimeSpan(const TimeSpanType& t) : m_ts(t) { /* ... */
+    public:
+        constexpr ALWAYS_INLINE TimeSpan(const TimeSpanType &t) : m_ts(t)
+        { /* ... */
         }
 
         static constexpr ALWAYS_INLINE TimeSpan FromNanoSeconds(s64 ns) { return TimeSpanType::FromNanoSeconds(ns); }
@@ -119,39 +140,49 @@ namespace nn {
         constexpr ALWAYS_INLINE s64 GetHours() const { return m_ts.GetHours(); }
         constexpr ALWAYS_INLINE s64 GetDays() const { return m_ts.GetDays(); }
 
-        constexpr ALWAYS_INLINE friend bool operator==(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator==(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts == rhs.m_ts;
         }
-        constexpr ALWAYS_INLINE friend bool operator!=(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator!=(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts != rhs.m_ts;
         }
-        constexpr ALWAYS_INLINE friend bool operator<=(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator<=(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts <= rhs.m_ts;
         }
-        constexpr ALWAYS_INLINE friend bool operator>=(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator>=(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts >= rhs.m_ts;
         }
-        constexpr ALWAYS_INLINE friend bool operator<(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator<(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts < rhs.m_ts;
         }
-        constexpr ALWAYS_INLINE friend bool operator>(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend bool operator>(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             return lhs.m_ts > rhs.m_ts;
         }
 
-        constexpr ALWAYS_INLINE TimeSpan& operator+=(const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE TimeSpan &operator+=(const TimeSpan &rhs)
+        {
             m_ts += rhs.m_ts;
             return *this;
         }
-        constexpr ALWAYS_INLINE TimeSpan& operator-=(const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE TimeSpan &operator-=(const TimeSpan &rhs)
+        {
             m_ts -= rhs.m_ts;
             return *this;
         }
 
-        constexpr ALWAYS_INLINE friend TimeSpan operator+(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend TimeSpan operator+(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             TimeSpan r(lhs);
             return r += rhs;
         }
-        constexpr ALWAYS_INLINE friend TimeSpan operator-(const TimeSpan& lhs, const TimeSpan& rhs) {
+        constexpr ALWAYS_INLINE friend TimeSpan operator-(const TimeSpan &lhs, const TimeSpan &rhs)
+        {
             TimeSpan r(lhs);
             return r -= rhs;
         }

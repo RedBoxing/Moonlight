@@ -4,13 +4,13 @@ namespace Starlight
 {
     namespace UI
     {
-        class Element
+        namespace Elements
         {
-        public:
-            Element();
-            virtual ~Element();
-
-            virtual void render();
-        };
+            class Element
+            {
+            public:
+                virtual void render();
+            };
+        }
     }
 }

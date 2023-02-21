@@ -24,7 +24,6 @@ nvn::WindowBuilderSetTexturesFunc tempWindowBuilderSetTexFunc;
 nvn::WindowSetCropFunc tempWindowSetCropFunc;
 
 bool isUIInitialized = false;
-std::unique_ptr<Starlight::UI::Menu> mainMenu;
 
 static void *(*mallocFuncPtr)(size_t size);
 static void (*freeFuncPtr)(void *ptr);
@@ -67,7 +66,7 @@ bool Starlight::UI::Initialize()
 
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NavEnableGamepad;
 
         Logger::log("Loading Font.\n");
 
@@ -115,8 +114,8 @@ bool Starlight::UI::Initialize()
 
         Logger::log("Initializing Menu Framework.\n");
 
-        mainMenu = std::make_unique<Starlight::UI::Menu>();
-        mainMenu->Initialize();
+        Starlight::UI::mainMenu = std::make_unique<Starlight::UI::Menu>();
+        Starlight::UI::mainMenu->Initialize();
 
         Logger::log("UI Initialized.\n");
 
@@ -131,9 +130,9 @@ bool Starlight::UI::Initialize()
 
 void presentTexture(nvn::Queue *queue, nvn::Window *window, int texIndex)
 {
-    if (isUIInitialized && mainMenu != nullptr)
+    if (isUIInitialized && Starlight::UI::mainMenu != nullptr)
     {
-        mainMenu->update();
+        Starlight::UI::mainMenu->update();
     }
 
     tempPresentTexFunc(queue, window, texIndex);
@@ -253,6 +252,28 @@ return result;
 }
 ;
 
+#define INPUT_HOOK(type)                                                                           \
+    HOOK_DEFINE_TRAMPOLINE(Disable##type){                                                         \
+        static int Callback(int *unkInt, nn::hid::Npad##type *state, int count, uint const &port){ \
+            int result = Orig(unkInt, state, count, port);                                         \
+    if (!Starlight::HID::isReadingInput())                                                         \
+    {                                                                                              \
+        if (Starlight::UI::mainMenu->isFocused())                                                  \
+        {                                                                                          \
+            *state = nn::hid::Npad##type();                                                        \
+        }                                                                                          \
+    }                                                                                              \
+    return result;                                                                                 \
+    }                                                                                              \
+    }                                                                                              \
+    ;
+
+INPUT_HOOK(FullKeyState);
+INPUT_HOOK(HandheldState);
+INPUT_HOOK(JoyDualState);
+INPUT_HOOK(JoyLeftState);
+INPUT_HOOK(JoyRightState);
+
 void Starlight::UI::InitializeHooks()
 {
     Logger::log("Initializing UI Hooks.\n");
@@ -260,6 +281,11 @@ void Starlight::UI::InitializeHooks()
     nn::ro::LookupSymbol(reinterpret_cast<uintptr_t *>(&freeFuncPtr), "free");
 
     NvnBootstrapHook::InstallAtSymbol("nvnBootstrapLoader");
+    DisableFullKeyState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_16NpadFullKeyStateEiRKj");
+    DisableHandheldState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_17NpadHandheldStateEiRKj");
+    DisableJoyDualState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_16NpadJoyDualStateEiRKj");
+    DisableJoyLeftState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_16NpadJoyLeftStateEiRKj");
+    DisableJoyRightState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_17NpadJoyRightStateEiRKj");
 }
 
 void Starlight::UI::Utils::drawSeparator(int x, int y, int width, int tickness, ImU32 color)

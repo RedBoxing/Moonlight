@@ -1,10 +1,19 @@
 #include "main_window.hpp"
 #include "elements/button.hpp"
 #include "starlight/hid.hpp"
+#include "starlight/ui.hpp"
 
-Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", ImGui::GetMainViewport()->Pos.x, ImGui::GetMainViewport()->Pos.y, 448, ImGui::GetMainViewport()->Size.y, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus, false)
+Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448, 720, false)
 {
-    this->addElement(new Starlight::UI::Button("Test", nullptr));
+    this->setTitleBar(false);
+    this->setCollapse(false);
+    this->setResize(false);
+    this->setMove(false);
+    this->setBringToFront(false);
+    this->setNavFocus(false);
+
+    this->addElement(new Starlight::UI::Elements::Button("Test", []()
+                                                         { Starlight::UI::displayNotification("Test", nn::TimeSpan::FromSeconds(5)); }));
 }
 
 void Starlight::UI::Windows::MainWindow::handleInputs()
@@ -17,4 +26,14 @@ void Starlight::UI::Windows::MainWindow::handleInputs()
     {
         this->setEnabled(false);
     }
+}
+
+void Starlight::UI::Windows::MainWindow::onEnable()
+{
+    Starlight::UI::mainMenu->setFocused(true);
+}
+
+void Starlight::UI::Windows::MainWindow::onDisable()
+{
+    Starlight::UI::mainMenu->setFocused(false);
 }

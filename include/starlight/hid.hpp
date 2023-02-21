@@ -24,5 +24,7 @@ namespace Starlight
 
         void getMouseCoords(float *x, float *y);
         void getScrollDelta(float *x, float *y);
+
+        bool isReadingInput();
     }
 }
