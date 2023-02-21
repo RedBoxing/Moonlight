@@ -14,7 +14,7 @@ namespace Starlight
         public:
             Window(std::string title, int x, int y, int width, int height, bool enabledDefault = true);
 
-            void render();
+            virtual void render();
             virtual void handleInputs();
 
             void addElement(Elements::Element *element);
@@ -25,6 +25,8 @@ namespace Starlight
             void setCollapse(bool enabled);
             void setBringToFront(bool enabled);
             void setNavFocus(bool enabled);
+            void setScrollbar(bool enabled);
+            void setFocusOnAppearing(bool enabled);
 
             std::string getTitle();
             void setTitle(std::string title);

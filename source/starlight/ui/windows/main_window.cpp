@@ -9,11 +9,19 @@ Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448
     this->setCollapse(false);
     this->setResize(false);
     this->setMove(false);
-    this->setBringToFront(false);
-    this->setNavFocus(false);
+    this->setBringToFront(true);
+    this->setNavFocus(true);
 
-    this->addElement(new Starlight::UI::Elements::Button("Test", []()
-                                                         { Starlight::UI::displayNotification("Test", nn::TimeSpan::FromSeconds(5)); }));
+    this->addElement(new Starlight::UI::Elements::Title("Starlight", "V1.1.0 - PRIVATE"));
+
+    this->addElement(new Starlight::UI::Elements::Button("Test Notification", []()
+                                                         { Starlight::UI::displayNotification("Loaded Starlight!", nn::TimeSpan::FromMilliSeconds(2500)); }));
+
+    this->addElement(new Starlight::UI::Elements::Button("Test Notification 2", []()
+                                                         { Starlight::UI::displayNotification("Failed to place building!", nn::TimeSpan::FromMilliSeconds(2500)); }));
+
+    this->addElement(new Starlight::UI::Elements::Button("Clear Notifications", []()
+                                                         { Starlight::UI::clearNotifications(); }));
 }
 
 void Starlight::UI::Windows::MainWindow::handleInputs()

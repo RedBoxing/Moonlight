@@ -443,7 +443,7 @@ namespace ImguiNvnBackend
         io.BackendPlatformName = "Switch";
         io.BackendRendererName = "imgui_impl_nvn";
         io.IniFilename = nullptr;
-        io.MouseDrawCursor = true;
+        io.MouseDrawCursor = false;
         io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
         io.BackendFlags |= ImGuiBackendFlags_HasGamepad;

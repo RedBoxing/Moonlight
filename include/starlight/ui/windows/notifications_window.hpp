@@ -32,7 +32,7 @@ namespace Starlight
             nn::TimeSpan getDuration();
             nn::TimeSpan getTimeElapsed();
 
-        private:
+        public:
             std::string text;
             nn::TimeSpan duration;
             nn::os::Tick startTime;
@@ -45,13 +45,13 @@ namespace Starlight
             {
             public:
                 NotificationsWindow();
-                ~NotificationsWindow();
 
-                void render();
+                void render() override;
 
                 void addNotification(Notification notification);
+                void clearNotifications();
 
-            private:
+            public:
                 std::vector<Notification> notifications;
             };
         }

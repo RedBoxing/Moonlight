@@ -770,3 +770,35 @@ Serving on 0.0.0.0:3080
 [10.11.11.3] Creating ImGui Context.
 [10.11.11.3] Loading Font.
 [10.11.11.3] Client sent an empty message, assuming disconnect.
+Using selector: PollSelector
+Serving on 0.0.0.0:3080
+[10.0.0.10] Connected.
+[10.0.0.10] Connected to logging server!
+[10.0.0.10] Starlight Loaded!
+[10.0.0.10] Installing nvn Hooks.
+[10.0.0.10] Installing nvn Hooks.
+[10.0.0.10] Initializing UI.
+[10.0.0.10] Setting Allocator Functions.
+[10.0.0.10] Creating ImGui Context.
+[10.0.0.10] Loading Font.
+[10.0.0.10] Setting Style to Dark.
+[10.0.0.10] Initializing Backend.
+[10.0.0.10] Setting Default Data/Config Data.
+[10.0.0.10] Creating Backend Data.
+[10.0.0.10] Setting Init Data into Backend Data.
+[10.0.0.10] Adding Default Font.
+[10.0.0.10] Creating Shaders.
+[10.0.0.10] Creating/Loading Shaders.
+[10.0.0.10] Unable to compile shaders at runtime. falling back to pre-compiled shaders.
+[10.0.0.10] File Size: 12288, Aligned Size: 12288
+[10.0.0.10] Shader Binaries Loaded! Setting up Render Data.
+[10.0.0.10] Setting up ImGui Shaders.
+[10.0.0.10] Finished.
+[10.0.0.10] Setting up ImGui Font.
+[10.0.0.10] Finished.
+[10.0.0.10] Rendering Setup!
+[10.0.0.10] Initializing Menu Framework.
+[10.0.0.10] UI Initialized.
+[10.0.0.10] Initializing Vertex Buffer to Size: 480
+[10.0.0.10] Initializing Index Buffer to Size: 72
+[10.0.0.10] Disconnected.

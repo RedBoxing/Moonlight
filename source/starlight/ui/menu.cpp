@@ -14,10 +14,10 @@ bool focus = false;
 
 void Starlight::UI::Menu::Initialize()
 {
-    this->windows.push_back(new Windows::MainWindow());
-
     notificationsWindow = new Windows::NotificationsWindow();
     this->windows.push_back(notificationsWindow);
+
+    this->windows.push_back(new Windows::MainWindow());
 }
 
 void Starlight::UI::Menu::update()
@@ -52,4 +52,9 @@ void Starlight::UI::Menu::setFocused(bool focused)
 void Starlight::UI::displayNotification(std::string text, nn::TimeSpan duration)
 {
     notificationsWindow->addNotification(Notification(text, duration));
+}
+
+void Starlight::UI::clearNotifications()
+{
+    notificationsWindow->clearNotifications();
 }

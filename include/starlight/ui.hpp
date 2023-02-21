@@ -6,7 +6,7 @@
 #include "ui/window.hpp"
 #include "ui/elements/element.hpp"
 #include "ui/elements/button.hpp"
-#include "ui/elements/text.hpp"
+#include "ui/elements/title.hpp"
 
 namespace Starlight
 {
@@ -18,10 +18,11 @@ namespace Starlight
         bool Initialize();
 
         void displayNotification(std::string text, nn::TimeSpan duration);
+        void clearNotifications();
 
         namespace Utils
         {
-            void drawSeparator(int x, int y, int width, int tickness, ImU32 color);
+            void drawSeparator(float x, float y, float width, float tickness, ImU32 color);
         }
     }
 }

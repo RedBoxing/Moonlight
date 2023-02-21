@@ -66,7 +66,6 @@ bool Starlight::UI::Initialize()
 
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouse | ImGuiConfigFlags_NavEnableGamepad;
 
         Logger::log("Loading Font.\n");
 
@@ -95,7 +94,7 @@ bool Starlight::UI::Initialize()
         size_t size = nn::pl::GetSharedFontSize(nn::pl::SharedFontType_Standard);
         void *data = (void *)nn::pl::GetSharedFontAddress(nn::pl::SharedFontType_Standard);
 
-        io.Fonts->AddFontFromMemoryTTF(data, size, 26.0f, nullptr, nullptr);
+        io.Fonts->AddFontFromMemoryTTF(data, size, 20.0f, nullptr, nullptr);
         io.Fonts->Build();
         (void)io;
 
@@ -288,7 +287,7 @@ void Starlight::UI::InitializeHooks()
     DisableJoyRightState::InstallAtSymbol("_ZN2nn3hid6detail13GetNpadStatesEPiPNS0_17NpadJoyRightStateEiRKj");
 }
 
-void Starlight::UI::Utils::drawSeparator(int x, int y, int width, int tickness, ImU32 color)
+void Starlight::UI::Utils::drawSeparator(float x, float y, float width, float tickness, ImU32 color)
 {
     float x2 = x + width;
     float y2 = y + tickness;

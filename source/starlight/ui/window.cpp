@@ -116,6 +116,30 @@ void Starlight::UI::Window::setNavFocus(bool enabled)
     }
 }
 
+void Starlight::UI::Window::setScrollbar(bool enabled)
+{
+    if (enabled && this->flags & ImGuiWindowFlags_NoScrollbar)
+    {
+        this->flags &= ~ImGuiWindowFlags_NoScrollbar;
+    }
+    else if (!enabled && !(this->flags & ImGuiWindowFlags_NoScrollbar))
+    {
+        this->flags |= ImGuiWindowFlags_NoScrollbar;
+    }
+}
+
+void Starlight::UI::Window::setFocusOnAppearing(bool enabled)
+{
+    if (enabled && this->flags & ImGuiWindowFlags_NoFocusOnAppearing)
+    {
+        this->flags &= ~ImGuiWindowFlags_NoFocusOnAppearing;
+    }
+    else if (!enabled && !(this->flags & ImGuiWindowFlags_NoFocusOnAppearing))
+    {
+        this->flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+    }
+}
+
 std::string Starlight::UI::Window::getTitle()
 {
     return this->title;

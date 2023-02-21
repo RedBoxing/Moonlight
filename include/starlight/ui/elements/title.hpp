@@ -2,21 +2,23 @@
 
 #include "element.hpp"
 #include <string>
+
 namespace Starlight
 {
     namespace UI
     {
         namespace Elements
         {
-            class Text : public Element
+            class Title : public Element
             {
             public:
-                Text(std::string text);
+                Title(std::string text, std::string subtitle);
 
                 void render();
 
             private:
-                std::string text;
+                std::string title;
+                std::string subtitle;
             };
         }
     }
