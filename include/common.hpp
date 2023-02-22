@@ -2,10 +2,10 @@
 
 #include "types.h"
 
-#include "lib/alloc.hpp"
-#include "lib/nx/nx.h"
-#include "lib/result.hpp"
-#include "lib/libsetting.hpp"
+#include "exlaunch/alloc.hpp"
+#include "exlaunch/nx/nx.h"
+#include "exlaunch/result.hpp"
+#include "exlaunch/libsetting.hpp"
 
 #define APPEND_IMPL(x, y) x##y
 #define APPEND(x, y) APPEND_IMPL(x, y)
