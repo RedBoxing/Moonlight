@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <atomic>
 
-#include "program/logger/logger.hpp"
-
 #ifdef EXL_SUPPORTS_REBOOTPAYLOAD
 #include "lib/util/sys/soc.hpp"
 #include "reboot_to_payload.hpp"
@@ -69,20 +67,7 @@ namespace exl::diag
     }
 
     /* TODO: better assert/abort support. */
-    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...)
-    {
-        // format with vargs
-        char buf[0x100];
-        va_list args;
-        va_start(args, format);
-        std::vsnprintf(buf, sizeof(buf), format, args);
-        va_end(args);
-
-        // log
-        Logger::log("Assertion Failure: %s (%s:%d)", buf, file, line);
-        ABORT_WITH_VALUE(value)
-    }
-    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value)
+    void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AssertionFailureImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value, const char *format, ...) ABORT_WITH_VALUE(value) void NORETURN NOINLINE AbortImpl(const char *file, int line, const char *func, const char *expr, u64 value) ABORT_WITH_VALUE(value)
 
 };
 

@@ -1,6 +1,5 @@
 #include "MemoryBuffer.h"
 #include "imgui_impl_nvn.hpp"
-#include "logger/logger.hpp"
 
 MemoryBuffer::MemoryBuffer(size_t size)
 {
@@ -19,7 +18,6 @@ MemoryBuffer::MemoryBuffer(size_t size)
 
     if (!pool.Initialize(&bd->memPoolBuilder))
     {
-        Logger::log("Failed to Create Memory Pool!\n");
         return;
     }
 
@@ -27,7 +25,6 @@ MemoryBuffer::MemoryBuffer(size_t size)
 
     if (!buffer.Initialize(&bd->bufferBuilder))
     {
-        Logger::log("Failed to Init Buffer!\n");
         return;
     }
 
@@ -51,7 +48,6 @@ MemoryBuffer::MemoryBuffer(size_t size, nvn::MemoryPoolFlags flags)
 
     if (!pool.Initialize(&bd->memPoolBuilder))
     {
-        Logger::log("Failed to Create Memory Pool!\n");
         return;
     }
 
@@ -59,7 +55,6 @@ MemoryBuffer::MemoryBuffer(size_t size, nvn::MemoryPoolFlags flags)
 
     if (!buffer.Initialize(&bd->bufferBuilder))
     {
-        Logger::log("Failed to Init Buffer!\n");
         return;
     }
 
@@ -80,7 +75,6 @@ MemoryBuffer::MemoryBuffer(size_t size, void *bufferPtr, nvn::MemoryPoolFlags fl
 
     if (!pool.Initialize(&bd->memPoolBuilder))
     {
-        Logger::log("Failed to Create Memory Pool!\n");
         return;
     }
 
@@ -88,7 +82,6 @@ MemoryBuffer::MemoryBuffer(size_t size, void *bufferPtr, nvn::MemoryPoolFlags fl
 
     if (!buffer.Initialize(&bd->bufferBuilder))
     {
-        Logger::log("Failed to Init Buffer!\n");
         return;
     }
 

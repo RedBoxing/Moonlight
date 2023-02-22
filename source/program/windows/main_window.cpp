@@ -1,9 +1,7 @@
 #include "main_window.hpp"
-#include "elements/button.hpp"
-#include "starlight/hid.hpp"
-#include "starlight/ui.hpp"
+#include "moonlight_menu.hpp"
 
-Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448, 720, false)
+Moonlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448, 720, false)
 {
     this->setTitleBar(false);
     this->setCollapse(false);
@@ -12,7 +10,7 @@ Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448
     this->setBringToFront(true);
     this->setNavFocus(true);
 
-    this->addElement(new Starlight::UI::Elements::Title("Starlight", "V1.1.0 - PRIVATE"));
+    this->addElement(new Starlight::UI::Elements::Title("Moonlight", "V1.1.0 - PRIVATE"));
 
     this->addElement(new Starlight::UI::Elements::Button("Test Notification", []()
                                                          { Starlight::UI::displayNotification("Loaded Starlight!", nn::TimeSpan::FromMilliSeconds(2500)); }));
@@ -24,7 +22,7 @@ Starlight::UI::Windows::MainWindow::MainWindow() : Window("Starlight", 0, 0, 448
                                                          { Starlight::UI::clearNotifications(); }));
 }
 
-void Starlight::UI::Windows::MainWindow::handleInputs()
+void Moonlight::UI::Windows::MainWindow::handleInputs()
 {
     if (!this->isEnabled() && Starlight::HID::isButtonHold(nn::hid::NpadButton::ZL) && Starlight::HID::isButtonHold(nn::hid::NpadButton::ZR))
     {
@@ -36,12 +34,12 @@ void Starlight::UI::Windows::MainWindow::handleInputs()
     }
 }
 
-void Starlight::UI::Windows::MainWindow::onEnable()
+void Moonlight::UI::Windows::MainWindow::onEnable()
 {
-    Starlight::UI::mainMenu->setFocused(true);
+    Moonlight::UI::g_menu->setFocused(true);
 }
 
-void Starlight::UI::Windows::MainWindow::onDisable()
+void Moonlight::UI::Windows::MainWindow::onDisable()
 {
-    Starlight::UI::mainMenu->setFocused(false);
+    Moonlight::UI::g_menu->setFocused(false);
 }

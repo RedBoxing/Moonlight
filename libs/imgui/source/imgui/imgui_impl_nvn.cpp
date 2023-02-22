@@ -11,7 +11,6 @@
 #include "diag/assert.hpp"
 #include "imgui/imgui.h"
 #include "oe.h"
-#include "logger/logger.hpp"
 
 #define UBOSIZE 0x1000
 
@@ -55,8 +54,6 @@ namespace ImguiNvnBackend
 
         EXL_ASSERT(bd->testShader.Initialize(bd->device), "Unable to Init Program!");
         EXL_ASSERT(bd->testShader.SetShaders(2, bd->testShaderDatas), "Unable to Set Shaders!");
-
-        Logger::log("Test Shader Setup.\n");
     }
 
     // neat tool to cycle through all loaded textures in a texture pool
@@ -71,7 +68,6 @@ namespace ImguiNvnBackend
             if (Starlight::HID::isButtonPressed(nn::hid::NpadButton::Left))
             {
                 curId--;
-                Logger::log("ID: %d\n", curId);
             }
             else if (Starlight::HID::isButtonHold(nn::hid::NpadButton::Left))
             {
@@ -80,7 +76,6 @@ namespace ImguiNvnBackend
                 if (downCounter > 30)
                 {
                     curId--;
-                    Logger::log("ID: %d\n", curId);
                 }
             }
             else
@@ -91,7 +86,6 @@ namespace ImguiNvnBackend
             if (Starlight::HID::isButtonPressed(nn::hid::NpadButton::Right))
             {
                 curId++;
-                Logger::log("ID: %d\n", curId);
             }
             else if (Starlight::HID::isButtonHold(nn::hid::NpadButton::Right))
             {
@@ -100,7 +94,6 @@ namespace ImguiNvnBackend
                 if (upCounter > 30)
                 {
                     curId++;
-                    Logger::log("ID: %d\n", curId);
                 }
             }
             else
@@ -180,12 +173,10 @@ namespace ImguiNvnBackend
                 IM_FREE(bd->vtxBuffer);
             }
             bd->vtxBuffer = IM_NEW(MemoryBuffer)(totalVtxSize);
-            Logger::log("(Re)sized Vertex Buffer to Size: %d\n", totalVtxSize);
         }
 
         if (!bd->vtxBuffer->IsBufferReady())
         {
-            Logger::log("Cannot Draw Data! Buffers are not Ready.\n");
             return;
         }
 
@@ -229,23 +220,16 @@ namespace ImguiNvnBackend
 
     bool createShaders()
     {
-
-        Logger::log("Creating/Loading Shaders.\n");
-
         auto bd = getBackendData();
 
         if (false && ImguiShaderCompiler::CheckIsValidVersion(bd->device))
         {
-            Logger::log("GLSLC compiler can be used!\n");
-
             ImguiShaderCompiler::InitializeCompiler();
 
             bd->imguiShaderBinary = ImguiShaderCompiler::CompileShader("imgui");
         }
         else
         {
-            Logger::log("Unable to compile shaders at runtime. falling back to pre-compiled shaders.\n");
-
             Starlight::FS::LoadData loadData = {
                 .path = "sd:/starlight/shaders/imgui.bin",
                 .alignment = 0x1000,
@@ -267,9 +251,6 @@ namespace ImguiNvnBackend
 
     bool setupFont()
     {
-
-        Logger::log("Setting up ImGui Font.\n");
-
         auto bd = getBackendData();
 
         ImGuiIO &io = ImGui::GetIO();
@@ -286,19 +267,16 @@ namespace ImguiNvnBackend
         int totalPoolSize = ALIGN_UP(sampMemPoolSize + texMemPoolSize, 0x1000);
         if (!MemoryPoolMaker::createPool(&bd->sampTexMemPool, totalPoolSize))
         {
-            Logger::log("Failed to Create Texture/Sampler Memory Pool!\n");
             return false;
         }
 
         if (!bd->samplerPool.Initialize(&bd->sampTexMemPool, 0, MaxSampDescriptors))
         {
-            Logger::log("Failed to Create Sampler Pool!\n");
             return false;
         }
 
         if (!bd->texPool.Initialize(&bd->sampTexMemPool, sampMemPoolSize, MaxTexDescriptors))
         {
-            Logger::log("Failed to Create Texture Pool!\n");
             return false;
         }
 
@@ -312,7 +290,6 @@ namespace ImguiNvnBackend
         if (!MemoryPoolMaker::createPool(&bd->fontMemPool, ALIGN_UP(texPoolSize, 0x1000),
                                          nvn::MemoryPoolFlags::CPU_UNCACHED | nvn::MemoryPoolFlags::GPU_CACHED))
         {
-            Logger::log("Failed to Create Font Memory Pool!\n");
             return false;
         }
 
@@ -325,7 +302,6 @@ namespace ImguiNvnBackend
 
         if (!bd->fontTexture.Initialize(&bd->texBuilder))
         {
-            Logger::log("Failed to Create Font Texture!\n");
             return false;
         }
 
@@ -349,7 +325,6 @@ namespace ImguiNvnBackend
 
         if (!bd->fontSampler.Initialize(&bd->samplerBuilder))
         {
-            Logger::log("Failed to Init Font Sampler!\n");
             return false;
         }
 
@@ -362,21 +337,15 @@ namespace ImguiNvnBackend
         bd->fontTexHandle = bd->device->GetTextureHandle(bd->textureId, bd->samplerId);
         io.Fonts->SetTexID(&bd->fontTexHandle);
 
-        Logger::log("Finished.\n");
-
         return true;
     }
 
     bool setupShaders(u8 *shaderBinary, ulong binarySize)
     {
-
-        Logger::log("Setting up ImGui Shaders.\n");
-
         auto bd = getBackendData();
 
         if (!bd->shaderProgram.Initialize(bd->device))
         {
-            Logger::log("Failed to Initialize Shader Program!");
             return false;
         }
 
@@ -386,7 +355,6 @@ namespace ImguiNvnBackend
 
         if (!bd->shaderMemory->IsBufferReady())
         {
-            Logger::log("Shader Memory Pool not Ready! Unable to continue.\n");
             return false;
         }
 
@@ -405,7 +373,6 @@ namespace ImguiNvnBackend
 
         if (!bd->shaderProgram.SetShaders(2, bd->shaderDatas))
         {
-            Logger::log("Failed to Set shader data for program.\n");
             return false;
         }
 
@@ -417,7 +384,6 @@ namespace ImguiNvnBackend
 
         if (!bd->uniformMemory->IsBufferReady())
         {
-            Logger::log("Uniform Memory Pool not Ready! Unable to continue.\n");
             return false;
         }
         // setup vertex attrib & stream
@@ -428,8 +394,6 @@ namespace ImguiNvnBackend
 
         bd->streamState.SetDefaults().SetStride(sizeof(ImDrawVert));
 
-        Logger::log("Finished.\n");
-
         return true;
     }
 
@@ -437,8 +401,6 @@ namespace ImguiNvnBackend
     {
         ImGuiIO &io = ImGui::GetIO();
         EXL_ASSERT(!io.BackendRendererUserData, "Already Initialized Imgui Backend!");
-
-        Logger::log("Setting Default Data/Config Data.\n");
 
         io.BackendPlatformName = "Switch";
         io.BackendRendererName = "imgui_impl_nvn";
@@ -450,14 +412,10 @@ namespace ImguiNvnBackend
         io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
         io.DisplaySize = ImVec2(1280, 720); // default size
 
-        Logger::log("Creating Backend Data.\n");
-
         auto *bd = IM_NEW(NvnBackendData)();
         EXL_ASSERT(bd, "Backend was not Created!");
 
         io.BackendRendererUserData = (void *)bd;
-
-        Logger::log("Setting Init Data into Backend Data.\n");
 
         bd->device = initInfo.device;
         bd->queue = initInfo.queue;
@@ -465,28 +423,16 @@ namespace ImguiNvnBackend
         bd->viewportSize = ImVec2(1280, 720);
         bd->isInitialized = false;
 
-        Logger::log("Adding Default Font.\n");
-
         io.Fonts->AddFontDefault();
-
-        Logger::log("Creating Shaders.\n");
 
         if (createShaders())
         {
-            Logger::log("Shader Binaries Loaded! Setting up Render Data.\n");
-
             if (bd->isUseTestShader)
                 initTestShader();
 
             if (setupShaders(bd->imguiShaderBinary.ptr, bd->imguiShaderBinary.size) && setupFont())
             {
-                Logger::log("Rendering Setup!\n");
-
                 bd->isInitialized = true;
-            }
-            else
-            {
-                Logger::log("Failed to Setup Render Data!\n");
             }
         }
     }
@@ -625,7 +571,6 @@ namespace ImguiNvnBackend
         // if something went wrong during backend setup, don't try to render anything
         if (!bd->isInitialized)
         {
-            Logger::log("Backend Data was not fully initialized!\n");
             return;
         }
 
@@ -644,11 +589,6 @@ namespace ImguiNvnBackend
             {
                 bd->vtxBuffer->Finalize();
                 IM_FREE(bd->vtxBuffer);
-                Logger::log("Resizing Vertex Buffer to Size: %d\n", totalVtxSize);
-            }
-            else
-            {
-                Logger::log("Initializing Vertex Buffer to Size: %d\n", totalVtxSize);
             }
 
             bd->vtxBuffer = IM_NEW(MemoryBuffer)(totalVtxSize);
@@ -663,12 +603,6 @@ namespace ImguiNvnBackend
 
                 bd->idxBuffer->Finalize();
                 IM_FREE(bd->idxBuffer);
-
-                Logger::log("Resizing Index Buffer to Size: %d\n", totalIdxSize);
-            }
-            else
-            {
-                Logger::log("Initializing Index Buffer to Size: %d\n", totalIdxSize);
             }
 
             bd->idxBuffer = IM_NEW(MemoryBuffer)(totalIdxSize);
@@ -677,7 +611,6 @@ namespace ImguiNvnBackend
         // if we fail to resize/init either buffers, end execution before we try to use said invalid buffer(s)
         if (!(bd->vtxBuffer->IsBufferReady() && bd->idxBuffer->IsBufferReady()))
         {
-            Logger::log("Cannot Draw Data! Buffers are not Ready.\n");
             return;
         }
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "window.hpp"
+#include "starlight.hpp"
 
-namespace Starlight
+namespace Moonlight
 {
     namespace UI
     {
         namespace Windows
         {
-            class MainWindow : public Window
+            class MainWindow : public Starlight::UI::Window
             {
             public:
                 MainWindow();

@@ -22,15 +22,29 @@ include $(DEVKITPRO)/libnx/switch_rules
 #     - config.json
 #---------------------------------------------------------------------------------
 export TARGET		:=	$(notdir $(CURDIR))
-BUILD		:=	build
-ROOT_SOURCE	:=	$(TOPDIR)/source
-MODULES		:=	$(shell find $(ROOT_SOURCE) -mindepth 1 -maxdepth 1 -type d)
-SOURCES		:=	$(foreach module,$(MODULES),$(shell find $(module) -type d))
-SOURCES		:= 	$(foreach source,$(SOURCES),$(source:$(TOPDIR)/%=%)/)
+BUILD			:=	build
+
+ROOT_SOURCE		:=	$(TOPDIR)/source
+ROOT_INCLUDE 	:=	$(TOPDIR)/include
+ROOT_LIBS		:= 	$(TOPDIR)/libs
+
+MODULES_SRC		:=	$(shell find $(ROOT_SOURCE) -mindepth 1 -maxdepth 1 -type d)
+SOURCES			:=	$(foreach module,$(MODULES_SRC),$(shell find $(module) -type d))
+SOURCES			:= 	$(foreach source,$(SOURCES),$(source:$(TOPDIR)/%=%)/)
+
+MODULES_INCLUDE	:=	$(shell find $(ROOT_INCLUDE) -mindepth 1 -maxdepth 1 -type d)
+INCLUDES		:=	$(foreach module,$(MODULES_INCLUDE),$(shell find $(module) -type d))
+INCLUDES		:= 	$(foreach include,$(INCLUDES),$(include:$(TOPDIR)/%=%)/)
+
+LIBS_DIR		:=	$(shell find $(ROOT_LIBS) -mindepth 1 -maxdepth 1 -type d)
+
+LIBS_INCLUDES	:=	$(foreach lib,$(LIBS_DIR),$(shell find $(lib)/include -type d))
+INCLUDES		+=	$(foreach include,$(LIBS_INCLUDES),$(include:$(TOPDIR)/%=%)/)
+
+LIBS_SOURCE		:=	$(foreach lib,$(LIBS_DIR),$(shell find $(lib)/source -type d))
+SOURCES			+=	$(foreach source,$(LIBS_SOURCE),$(source:$(TOPDIR)/%=%)/)
 
 DATA		:=	data
-INCLUDES	:=	$(shell find ${$(TOPDIR)/include} -type d -print)
-INCLUDES	:=	$(foreach include,$(INCLUDES),$(include:$(TOPDIR)/%=%)/)
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -45,7 +59,8 @@ CFLAGS	:=	-g -Wall -Werror -O3 \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -D__RTLD_6XX__
 
-CFLAGS	+= $(EXL_CFLAGS) -I"$(DEVKITPRO)/libnx/include" -I$(ROOT_SOURCE) $(addprefix -I,$(MODULES))
+#CFLAGS	+= $(EXL_CFLAGS) -I"$(DEVKITPRO)/libnx/include" -I$(ROOT_SOURCE) $(addprefix -I,$(MODULES))
+CFLAGS	+= $(EXL_CFLAGS) -I$(ROOT_INCLUDE) $(addprefix -I,$(MODULES_INCLUDE))
 
 CXXFLAGS	:= $(CFLAGS) $(EXL_CXXFLAGS) -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -std=c++20
 

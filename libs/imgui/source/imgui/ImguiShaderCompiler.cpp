@@ -7,7 +7,6 @@
 #include "result.hpp"
 #include <cstring>
 #include <cstdio>
-#include "logger/logger.hpp"
 
 // list of every shader type nvn supports/glslc can compile (in the order of NVNshaderStage)
 
@@ -40,21 +39,11 @@ extern "C" void *glslc_Realloc(void *ptr, size_t size, void *user_data = nullptr
 
 void NOINLINE ReadCompiledShader(GLSLCoutput *compileData)
 {
-
-    Logger::log("Shader Count: %d\n", compileData->numSections);
-
     for (u32 i = 0; i < compileData->numSections; ++i)
     {
         if (compileData->headers[i].genericHeader.common.type != GLSLCsectionTypeEnum::GLSLC_SECTION_TYPE_GPU_CODE)
             continue;
-        auto compInfo = &compileData->headers[i].gpuCodeHeader;
-
-        Logger::log("Shader Stage: %s\n", shaderNames[compInfo->stage]);
-        Logger::log("Section Size: %x\n", compInfo->common.size);
-        Logger::log("Control Offset: %x\n", compInfo->common.size + compInfo->controlOffset);
-        Logger::log("Control Size: %x\n", compInfo->controlSize);
-        Logger::log("Data Offset: %x\n", compInfo->common.size + compInfo->dataOffset);
-        Logger::log("Data Size: %x\n", compInfo->dataSize);
+        // auto compInfo = &compileData->headers[i].gpuCodeHeader;
     }
 }
 
@@ -154,16 +143,11 @@ const char *GetShaderSource(const char *path)
 
 bool ImguiShaderCompiler::CheckIsValidVersion(nvn::Device *device)
 {
-
-    Logger::log("Checking if GLSLC subsdk is on a valid version.\n");
-
     nn::gfx::detail::GlslcDll *glslcDll = nn::gfx::detail::GlslcDll::GetInstance();
 
     if (glslcDll->IsInitialized())
     {
         auto versionInfo = glslcDll->GlslcGetVersion();
-        Logger::log("GLSLC Major Version: %d\n", versionInfo.apiMajor);
-        Logger::log("GLSLC Minor Version: %d\n", versionInfo.apiMinor);
 
         int minMajorVersion = 0;
         int maxMajorVersion = 0;
@@ -171,33 +155,24 @@ bool ImguiShaderCompiler::CheckIsValidVersion(nvn::Device *device)
         int maxMinorVersion = 0;
 
         device->GetInteger(nvn::DeviceInfo::GLSLC_MIN_SUPPORTED_GPU_CODE_MAJOR_VERSION, &minMajorVersion);
-        Logger::log("NVN Api Min Major Version: %d\n", minMajorVersion);
         device->GetInteger(nvn::DeviceInfo::GLSLC_MAX_SUPPORTED_GPU_CODE_MAJOR_VERSION, &maxMajorVersion);
-        Logger::log("NVN Api Max Major Version: %d\n", maxMajorVersion);
         device->GetInteger(nvn::DeviceInfo::GLSLC_MIN_SUPPORTED_GPU_CODE_MINOR_VERSION, &minMinorVersion);
-        Logger::log("NVN Api Min Minor Version: %d\n", minMinorVersion);
         device->GetInteger(nvn::DeviceInfo::GLSLC_MAX_SUPPORTED_GPU_CODE_MINOR_VERSION, &maxMinorVersion);
-        Logger::log("NVN Api Max Minor Version: %d\n", maxMinorVersion);
 
         if ((versionInfo.apiMajor >= (u32)minMajorVersion && versionInfo.apiMajor <= (u32)maxMajorVersion) &&
             (versionInfo.apiMinor >= (u32)minMinorVersion && versionInfo.apiMinor <= (u32)maxMinorVersion))
         {
-            Logger::log("NVN Api supports GLSLC version!\n");
             return true;
         }
         else if (minMajorVersion == 1 && maxMajorVersion == 1)
         {
-            Logger::log("Unable to verify if version is valid. Continuing to use GLSLC.\n");
             return true;
         }
 
-        Logger::log(
-            "Current NVN Api is incompatible with supplied GLSLC binary!\nTry using a GLSLC binary from a different game.\n");
         return false;
     }
     else
     {
-        Logger::log("GLSLC Instance is not Initialized! Or unable to find function pointers.\n");
         return false;
     }
 }
@@ -206,12 +181,7 @@ void ImguiShaderCompiler::InitializeCompiler()
 {
 
     nn::gfx::detail::GlslcDll *glslcDll = nn::gfx::detail::GlslcDll::GetInstance();
-
-    Logger::log("Setting Glslc Alloc funcs.\n");
-
     glslcDll->GlslcSetAllocator(glslc_Alloc, glslc_Free, glslc_Realloc, nullptr);
-
-    Logger::log("Funcs setup.\n");
 }
 
 CompiledData ImguiShaderCompiler::CompileShader(const char *shaderName)
@@ -219,14 +189,11 @@ CompiledData ImguiShaderCompiler::CompileShader(const char *shaderName)
 
     nn::gfx::detail::GlslcDll *glslcDll = nn::gfx::detail::GlslcDll::GetInstance();
 
-    Logger::log("Running compiler for File(s): %s\n", shaderName);
-
     GLSLCcompileObject initInfo{};
     initInfo.options = glslcDll->GlslcGetDefaultOptions();
 
     if (!glslcDll->GlslcInitialize(&initInfo))
     {
-        Logger::log("Unable to Init with info.\n");
         return {};
     }
 
@@ -248,17 +215,8 @@ CompiledData ImguiShaderCompiler::CompileShader(const char *shaderName)
     initInfo.input.stages = stages;
     initInfo.input.count = 2;
 
-    if (glslcDll->GlslcCompile(&initInfo))
+    if (!glslcDll->GlslcCompile(&initInfo))
     {
-        Logger::log("Successfully Compiled Shaders!\n");
-    }
-    else
-    {
-        Logger::log("%s", initInfo.lastCompiledResults->compilationStatus->infoLog);
-
-        Logger::log("Vert Shader Source:\n%s\n", shaders[0]);
-        Logger::log("Frag Shader Source:\n%s\n", shaders[1]);
-
         EXL_ABORT(0, "Failed to Compile supplied shaders. \nVert Path: %s\nFrag Path: %s\n", vshPath, fshPath);
     }
 
