@@ -230,15 +230,7 @@ namespace ImguiNvnBackend
         }
         else
         {
-            Starlight::FS::LoadData loadData = {
-                .path = "sd:/starlight/shaders/imgui.bin",
-                .alignment = 0x1000,
-            };
-
-            Starlight::FS::loadFile(loadData);
-
-            bd->imguiShaderBinary.size = loadData.bufSize;
-            bd->imguiShaderBinary.ptr = (u8 *)loadData.buffer;
+            Starlight::FS::readFile("sd:/starlight/shaders/imgui.bin", (void **)&bd->imguiShaderBinary.ptr, &bd->imguiShaderBinary.size);
         }
 
         if (bd->imguiShaderBinary.size > 0)

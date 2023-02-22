@@ -1,6 +1,15 @@
 #include "lib.hpp"
 #include "starlight.hpp"
-#include "moonlight_menu.hpp"
+#include "moonlight_overlay.hpp"
+
+HOOK_DEFINE_TRAMPOLINE(MainInitHook){
+    static void Callback(){
+        R_ABORT_UNLESS(nn::fs::MountSdCardForDebug("sd"));
+
+Orig();
+}
+}
+;
 
 extern "C" void exl_main(void *x0, void *x1)
 {
@@ -8,10 +17,10 @@ extern "C" void exl_main(void *x0, void *x1)
 
     /* Setup hooking enviroment. */
     exl::hook::Initialize();
+    MainInitHook::InstallAtSymbol("nnMain");
 
-    Moonlight::UI::g_menu = new Moonlight::UI::Menu();
-
-    Starlight::Initialize(Moonlight::UI::g_menu);
+    Moonlight::UI::g_overlay = new Moonlight::UI::Overlay();
+    Starlight::Initialize(Moonlight::UI::g_overlay);
 }
 
 extern "C" NORETURN void exl_exception_entry()
