@@ -1,0 +1,3 @@
+[submodule "libs/starlight"]
+	path = libs/starlight
+	url = https://github.com/RedBoxing/Starlight
