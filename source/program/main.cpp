@@ -17,10 +17,10 @@ extern "C" void exl_main(void *x0, void *x1)
 
     /* Setup hooking enviroment. */
     exl::hook::Initialize();
+
     MainInitHook::InstallAtSymbol("nnMain");
 
-    Moonlight::UI::g_overlay = new Moonlight::UI::Overlay();
-    Starlight::Initialize(Moonlight::UI::g_overlay);
+    Starlight::Initialize(new Moonlight::UI::Overlay());
 }
 
 extern "C" NORETURN void exl_exception_entry()

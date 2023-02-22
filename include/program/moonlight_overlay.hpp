@@ -11,7 +11,5 @@ namespace Moonlight
         public:
             Overlay();
         };
-
-        inline Moonlight::UI::Overlay *g_overlay = nullptr;
     }
 }
