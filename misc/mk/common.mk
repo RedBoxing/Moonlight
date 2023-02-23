@@ -30,6 +30,7 @@ ROOT_LIBS		:= 	$(TOPDIR)/libs
 
 MODULES_SRC		:=	$(shell find $(ROOT_SOURCE) -mindepth 1 -maxdepth 1 -type d)
 SOURCES			:=	$(foreach module,$(MODULES_SRC),$(shell find $(module) -type d))
+SOURCES 		+=	$(ROOT_SOURCE)
 SOURCES			:= 	$(foreach source,$(SOURCES),$(source:$(TOPDIR)/%=%)/)
 
 MODULES_INCLUDE	:=	$(shell find $(ROOT_INCLUDE) -mindepth 1 -maxdepth 1 -type d)

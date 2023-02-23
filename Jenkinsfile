@@ -21,11 +21,11 @@ spec:
       steps {
         container("devkitpro") {
             // Build the project
-            sh "exlaunch.sh make"
+            sh "sh exlaunch.sh make"
 
             // prepare the deploy folder
             sh "mkdir  atmosphere/contents/01006F8002326000/exefs"
-            mv "deploy/* atmosphere/contents/01006F8002326000/exefs"
+            sh "mv deploy/* atmosphere/contents/01006F8002326000/exefs"
             // zip the atmosphere folder
             sh "zip -r deploy/atmosphere.zip atmosphere"
         }

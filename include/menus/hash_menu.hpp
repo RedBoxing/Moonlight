@@ -8,10 +8,10 @@ namespace Moonlight
     {
         namespace Menus
         {
-            class SaveMenu : public Starlight::UI::Elements::Menu
+            class HashMenu : public Starlight::UI::Elements::Menu
             {
             public:
-                SaveMenu(Starlight::UI::Window *window);
+                HashMenu(Starlight::UI::Window *window, std::vector<std::string> &hashes);
             };
         }
     }
