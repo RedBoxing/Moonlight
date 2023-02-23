@@ -51,15 +51,15 @@ export NPDM_JSON_PATH=$MISC_PATH/npdm-json
 export NPDM_JSON=$NPDM_JSON_PATH/$NPDM_JSON
 
 # Import target env variables.
-source $SCRIPTS_PATH/target-common.sh
+. $SCRIPTS_PATH/target-common.sh
 
 # Import target env for load kind.
 if [ $LOAD_KIND == "Module" ]; then
     export LOAD_KIND_ENUM=2
-    source $SCRIPTS_PATH/target-module.sh
+    . $SCRIPTS_PATH/target-module.sh
 elif [ $LOAD_KIND == "AsRtld" ]; then
     export LOAD_KIND_ENUM=1
-    source $SCRIPTS_PATH/target-rtld.sh
+    . $SCRIPTS_PATH/target-rtld.sh
 else 
     echo "Invalid LOAD_KIND!"
     exit 1
@@ -68,15 +68,15 @@ fi
 # Perform user action.
 if [ "$1" == "build" ]; then
     make $MAKE_ARGS
-    source $SCRIPTS_PATH/post-build.sh
+    . $SCRIPTS_PATH/post-build.sh
 elif [ "$1" == "clean" ]; then
     make $MAKE_ARGS clean
 elif [ "$1" == "deploy-sd" ]; then
-    source $SCRIPTS_PATH/deploy-sd.sh
+    . $SCRIPTS_PATH/deploy-sd.sh
 elif [ "$1" == "deploy-ftp" ]; then
     $PYTHON $SCRIPTS_PATH/deploy-ftp.py
 elif [ "$1" == "deploy-ryu" ]; then
-     source $SCRIPTS_PATH/deploy-ryu.sh
+     . $SCRIPTS_PATH/deploy-ryu.sh
 elif [ "$1" == "make-npdm-json" ]; then
     $PYTHON $SCRIPTS_PATH/make-npdm-json.py
 else
