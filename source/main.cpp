@@ -1,7 +1,7 @@
 #include "exlaunch.hpp"
 #include "starlight.hpp"
 #include "moonlight_overlay.hpp"
-#include "nn/crypto.h"
+#include "logger.hpp"
 
 HOOK_DEFINE_TRAMPOLINE(MainInitHook){
     static void Callback(){
@@ -12,11 +12,29 @@ Orig();
 }
 ;
 
-HOOK_DEFINE_TRAMPOLINE(SHA1_HASH_HOOK){
-    static void Callback(void *dstBuffer, u64 dstBufferSize, const void *srcBuffer, u64 srcBufferSize){
-        Orig(dstBuffer, dstBufferSize, srcBuffer, srcBufferSize);
+HOOK_DEFINE_TRAMPOLINE(TEST_HOOK){
+    static void * Callback(void *packetReaderInstance, char *x1){
+                      void *ret = Orig(packetReaderInstance, x1);
 
-sha1Hashes.push_back(std::to_string(srcBufferSize) + " bytes");
+Moonlight::Logger::log("PacketReader");
+
+return ret;
+}
+}
+;
+
+HOOK_DEFINE_TRAMPOLINE(LOG1_HOOK){
+    static void Callback(void *x0, void *x1, void *x2, bool x3, char *str){
+        Moonlight::Logger::log(str);
+Orig(x0, x1, x2, x3, str);
+}
+}
+;
+
+HOOK_DEFINE_TRAMPOLINE(LOG2_HOOK){
+    static void Callback(void *x0, void *x1, void *x2, char *str){
+        Moonlight::Logger::log(str);
+Orig(x0, x1, x2, str);
 }
 }
 ;
@@ -29,7 +47,10 @@ extern "C" void exl_main(void *x0, void *x1)
     exl::hook::Initialize();
 
     MainInitHook::InstallAtSymbol("nnMain");
-    SHA1_HASH_HOOK::InstallAtFuncPtr(nn::crypto::GenerateSha1Hash);
+    TEST_HOOK::InstallAtOffset(0x257D510);
+
+    // LOG1_HOOK::InstallAtOffset(0x25BA000);
+    // LOG2_HOOK::InstallAtOffset(0x25BA010);
 
     Starlight::Initialize(new Moonlight::UI::Overlay());
 }

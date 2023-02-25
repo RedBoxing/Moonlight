@@ -143,6 +143,7 @@ all: $(BUILD)
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(MK_PATH)/common.mk
+	@$(SHELL) $(SCRIPTS_PATH)/post-build.sh
 
 #---------------------------------------------------------------------------------
 clean:
